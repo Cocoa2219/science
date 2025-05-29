@@ -44,8 +44,8 @@ stream = p.open(format=FORMAT,
                 input_device_index=device_index,
                 frames_per_buffer=CHUNK)
 
-# fig, (ax_original, ax_filtered, ax_fft) = plt.subplots(3, 1, figsize=(8, 6))
-fig, (ax_original, ax_filtered) = plt.subplots(2, 1, figsize=(8, 6))
+fig, (ax_original, ax_filtered, ax_fft) = plt.subplots(3, 1, figsize=(8, 6))
+# fig, (ax_original, ax_filtered) = plt.subplots(2, 1, figsize=(8, 6))
 x_time = np.arange(0, CHUNK)
 
 line_original, = ax_original.plot(x_time, np.zeros(CHUNK), label="Original", color='gray')
@@ -56,13 +56,13 @@ line_filtered, = ax_filtered.plot(x_time, np.zeros(CHUNK), label="Filtered", col
 ax_filtered.set_ylim(-32768, 32767)
 ax_filtered.set_title("Noise-Filtered Waveform")
 
-# x_fft = np.fft.rfftfreq(CHUNK, d=1./RATE)
-# line_fft, = ax_fft.semilogx(x_fft, np.zeros(len(x_fft)), label="FFT", color='red')
-# ax_fft.set_xlim(20, RATE/2)
-# ax_fft.set_ylim(0, 30000)
-# ax_fft.set_title("FFT Spectrum (Noise Removed)")
+x_fft = np.fft.rfftfreq(CHUNK, d=1./RATE)
+line_fft, = ax_fft.semilogx(x_fft, np.zeros(len(x_fft)), label="FFT", color='red')
+ax_fft.set_xlim(20, RATE/2)
+ax_fft.set_ylim(0, 30000)
+ax_fft.set_title("FFT Spectrum (Noise Removed)")
 
-# max_freq_line = ax_fft.axvline(x=0, color='green', linestyle='--', label='Peak Frequency')
+max_freq_line = ax_fft.axvline(x=0, color='green', linestyle='--', label='Peak Frequency')
 
 plt.tight_layout()
 plt.show(block=False)
@@ -79,14 +79,14 @@ try:
         line_original.set_ydata(samples)
         line_filtered.set_ydata(filtered)
 
-        # fft_vals = np.abs(np.fft.rfft(filtered))
-        # cleaned_fft = np.clip(fft_vals, 0, None)
-        # line_fft.set_ydata(cleaned_fft)
-        #
-        # peak_index = np.argmax(cleaned_fft)
-        # peak_freq = x_fft[peak_index]
-        # max_freq_line.set_xdata([peak_freq, peak_freq])
-        # ax_fft.set_title(f"FFT Spectrum - Peak: {int(peak_freq)} Hz")
+        fft_vals = np.abs(np.fft.rfft(filtered))
+        cleaned_fft = np.clip(fft_vals, 0, None)
+        line_fft.set_ydata(cleaned_fft)
+
+        peak_index = np.argmax(cleaned_fft)
+        peak_freq = x_fft[peak_index]
+        max_freq_line.set_xdata([peak_freq, peak_freq])
+        ax_fft.set_title(f"FFT Spectrum - Peak: {int(peak_freq)} Hz")
 
         fig.canvas.draw()
         fig.canvas.flush_events()
